@@ -10,6 +10,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.os.Build;
+import android.widget.LinearLayout;
+
+import com.julianogv.androiddiskreport.CustomViews.PieChartView;
 
 public class MainActivity extends Activity {
 
@@ -23,6 +26,12 @@ public class MainActivity extends Activity {
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
         }
+
+        LinearLayout lv1 = (LinearLayout) findViewById(R.id.linear);
+        PieChartView pieChartView = new PieChartView(this);
+        lv1.addView(pieChartView);
+
+
     }
 
 
