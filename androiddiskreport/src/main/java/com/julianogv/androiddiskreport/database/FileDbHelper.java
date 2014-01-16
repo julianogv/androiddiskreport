@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public class FileDbHelper extends SQLiteOpenHelper {
     public static final String TABLE_NAME = "fileData";
-    public static final String DATABASE = "androiddiskreport";
+    public static final String DATABASE = "androiddiskreport.sqlite";
     public static final int VERSION = 1;
 
     public FileDbHelper(Context context) {
@@ -19,6 +19,7 @@ public class FileDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        db.execSQL("drop table if exists fileData");
         db.execSQL("create table fileData( "
                 +"id integer primary key autoincrement, "
                 +"path text not null, "
@@ -35,5 +36,11 @@ public class FileDbHelper extends SQLiteOpenHelper {
             db.execSQL("drop table if exists fileData");
             onCreate(db);
         }
+    }
+
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        onCreate(db);
+        super.onOpen(db);
     }
 }

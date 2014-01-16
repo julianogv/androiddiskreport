@@ -14,7 +14,7 @@ public class FileEntity {
 
     }
 
-    public FileEntity(Integer id, String path, Integer length, Integer isDirectory, Integer parentId){
+    public FileEntity(Integer id, String path, Integer isDirectory, Integer length, Integer parentId){
         this.setId(id);
         this.setIsDirectory(isDirectory);
         this.setLength(length);

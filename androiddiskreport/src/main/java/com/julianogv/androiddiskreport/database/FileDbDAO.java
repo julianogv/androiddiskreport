@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
@@ -44,11 +45,13 @@ public class FileDbDAO {
     public List<FileEntity> cursorToFileEntityList(Cursor cursor){
         List<FileEntity> files = new ArrayList<FileEntity>();
         cursor.moveToFirst();
-
+        Log.d("JULIANOJ", "Cursor Count: " + cursor.getCount());
         for(int i=0; i < cursor.getCount(); i++){
             files.add(new FileEntity(cursor.getInt(0), cursor.getString(1), cursor.getInt(2),
                     cursor.getInt(3), cursor.getInt(4)));
+            cursor.moveToNext();
         }
+        Log.d("JULIANOJ", "Cursor Count: " + cursor.getCount());
         return files;
     }
 
@@ -73,7 +76,12 @@ public class FileDbDAO {
     }
 
     public Integer getDirectorySize(String path){
-        cursor = database.rawQuery("select id, path, isDirectory, length, parentId from fileData where path = " + path, null);
+        cursor = database.rawQuery("select fd2.id, fd2.path, fd2.isDirectory, fd2.length, fd2.parentId"
+                + " from filedata fd1"
+                + " inner join filedata fd2 on fd1.id = fd2.parentid"
+                + " where fd1.path = '" + path + "'", null);
+
+
         Integer dirSize = 0;
 
         if (cursor.getCount() > 0) {
@@ -82,6 +90,7 @@ public class FileDbDAO {
                 if(file.getIsDirectory() == 1){
                     dirSize += getDirectorySize(file.getPath());
                 }else{
+                    Log.d("JULIANOJ", file.getPath() + " " + file.getLength());
                     dirSize += file.getLength();
                 }
             }

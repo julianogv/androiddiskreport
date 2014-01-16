@@ -37,7 +37,7 @@ public class MainActivity extends Activity {
             e.printStackTrace();
         }*/
 
-        List<File> files = Utils.getFileList(new File("/storage/emulated/0/testee"));
+        List<File> files = Utils.getFileList(new File("/storage/emulated/0/teste"));
 
         FileDbDAO dbDAO = new FileDbDAO(this);
         Integer parentId;
@@ -45,20 +45,17 @@ public class MainActivity extends Activity {
         for(File file: files){
             Long longLength = file.length();
             Integer isDirectory = file.isDirectory() == true ? 1 : 0;
-            Log.d("JULIANOJ", file.getPath());
-            Log.d("JULIANOJ", file.getParent());
-            Log.d("JULIANOJ", file.getParent());
             parentId = dbDAO.getOrCreateParentIdByPath(file.getParent());
-            Log.d("JULIANOJ", parentId+"");
             dbDAO.insert(file.getPath(), longLength.intValue(), isDirectory, parentId);
         }
+
+        Integer dirSize = dbDAO.getDirectorySize("/");
+        Log.d("JULIANOJ", "Directory size: " + dirSize);
     }
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        
+
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
