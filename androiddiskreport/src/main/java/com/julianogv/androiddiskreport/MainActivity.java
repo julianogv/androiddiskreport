@@ -37,7 +37,7 @@ public class MainActivity extends Activity {
             e.printStackTrace();
         }*/
 
-        List<File> files = Utils.getFileList(new File("/storage/emulated/0/teste"));
+        List<File> files = Utils.getFileList(new File("/storage/emulated/0/testee"));
 
         FileDbDAO dbDAO = new FileDbDAO(this);
         Integer parentId;
