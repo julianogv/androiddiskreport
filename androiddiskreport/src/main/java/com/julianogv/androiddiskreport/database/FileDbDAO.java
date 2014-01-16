@@ -56,7 +56,7 @@ public class FileDbDAO {
     }
 
 
-    public Integer getOrCreateParentIdByPath(String path){
+    public Integer getOrCreateParentIdByPath(String path, boolean recursiveSearchParent){
         if(path == null){
             return null;
         }
@@ -65,13 +65,12 @@ public class FileDbDAO {
         if(cursor.getCount() > 0){
             return cursorToFileEntity(cursor).getId();
         }else{
-            int parentId;
-
             File file = new File(path);
-
-            parentId = insert(path, null, 1, getOrCreateParentIdByPath(file.getParent()));
-
-            return parentId;
+            if(recursiveSearchParent == true){
+                return insert(path, null, 1, getOrCreateParentIdByPath(file.getParent(), true));
+            }else{
+                return insert(path, null, 1, null);
+            }
         }
     }
 
@@ -90,7 +89,6 @@ public class FileDbDAO {
                 if(file.getIsDirectory() == 1){
                     dirSize += getDirectorySize(file.getPath());
                 }else{
-                    Log.d("JULIANOJ", file.getPath() + " " + file.getLength());
                     dirSize += file.getLength();
                 }
             }

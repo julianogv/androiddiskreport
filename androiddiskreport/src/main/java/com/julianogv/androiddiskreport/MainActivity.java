@@ -37,16 +37,22 @@ public class MainActivity extends Activity {
             e.printStackTrace();
         }*/
 
-        List<File> files = Utils.getFileList(new File("/storage/emulated/0/teste"));
+        List<File> files = Utils.getFileList(new File("/storage/emulated/0"));
 
         FileDbDAO dbDAO = new FileDbDAO(this);
         Integer parentId;
 
-        for(File file: files){
-            Long longLength = file.length();
-            Integer isDirectory = file.isDirectory() == true ? 1 : 0;
-            parentId = dbDAO.getOrCreateParentIdByPath(file.getParent());
-            dbDAO.insert(file.getPath(), longLength.intValue(), isDirectory, parentId);
+        Log.d("JULIANOJ", "FILES FOUND: " + files.size());
+
+        for(int i=0; i < files.size(); i++){
+
+            if(i % 1000 == 0){
+                Log.d("JULIANOJ", "CURRENT POS: " + i);
+            }
+            Long longLength = files.get(i).length();
+            Integer isDirectory = files.get(i).isDirectory() == true ? 1 : 0;
+            parentId = dbDAO.getOrCreateParentIdByPath(files.get(i).getParent(), false);
+            dbDAO.insert(files.get(i).getPath(), longLength.intValue(), isDirectory, parentId);
         }
 
         Integer dirSize = dbDAO.getDirectorySize("/");

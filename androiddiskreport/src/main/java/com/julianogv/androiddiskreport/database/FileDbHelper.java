@@ -19,7 +19,7 @@ public class FileDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("drop table if exists fileData");
+        //db.execSQL("drop table if exists fileData");
         db.execSQL("create table fileData( "
                 +"id integer primary key autoincrement, "
                 +"path text not null, "
@@ -32,8 +32,8 @@ public class FileDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if ((newVersion - oldVersion) > 2) {
-            db.execSQL("drop table if exists fileData");
+        if (newVersion != oldVersion){
+            //db.execSQL("drop table if exists fileData");
             onCreate(db);
         }
     }
