@@ -1,38 +1,59 @@
 package com.julianogv.androiddiskreport;
 
 import android.app.Activity;
-import android.app.ActionBar;
 import android.app.Fragment;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.os.Build;
 import android.widget.LinearLayout;
 
-import com.julianogv.androiddiskreport.CustomViews.PieChartView;
+import com.julianogv.androiddiskreport.database.FileDbDAO;
+import com.julianogv.androiddiskreport.database.FileDbHelper;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 public class MainActivity extends Activity {
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (savedInstanceState == null) {
-            getFragmentManager().beginTransaction()
-                    .add(R.id.container, new PlaceholderFragment())
-                    .commit();
-        }
-
         LinearLayout lv1 = (LinearLayout) findViewById(R.id.linear);
         PieChartView pieChartView = new PieChartView(this);
         lv1.addView(pieChartView);
 
+        /*try {
+            Process p =  Runtime.getRuntime().exec("su");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
 
+        List<File> files = Utils.getFileList(new File("/storage/emulated/0/teste"));
+
+        FileDbDAO dbDAO = new FileDbDAO(this);
+        Integer parentId;
+
+        for(File file: files){
+            Long longLength = file.length();
+            Integer isDirectory = file.isDirectory() == true ? 1 : 0;
+            Log.d("JULIANOJ", file.getPath());
+            Log.d("JULIANOJ", file.getParent());
+            Log.d("JULIANOJ", file.getParent());
+            parentId = dbDAO.getOrCreateParentIdByPath(file.getParent());
+            Log.d("JULIANOJ", parentId+"");
+            dbDAO.insert(file.getPath(), longLength.intValue(), isDirectory, parentId);
+        }
     }
+
 
 
     @Override
