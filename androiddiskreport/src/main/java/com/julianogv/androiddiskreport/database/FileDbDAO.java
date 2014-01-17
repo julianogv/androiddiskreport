@@ -45,33 +45,44 @@ public class FileDbDAO {
     public List<FileEntity> cursorToFileEntityList(Cursor cursor){
         List<FileEntity> files = new ArrayList<FileEntity>();
         cursor.moveToFirst();
-        Log.d("JULIANOJ", "Cursor Count: " + cursor.getCount());
         for(int i=0; i < cursor.getCount(); i++){
             files.add(new FileEntity(cursor.getInt(0), cursor.getString(1), cursor.getInt(2),
                     cursor.getInt(3), cursor.getInt(4)));
             cursor.moveToNext();
         }
-        Log.d("JULIANOJ", "Cursor Count: " + cursor.getCount());
+        cursor.close();
         return files;
     }
 
 
-    public Integer getOrCreateParentIdByPath(String path, boolean recursiveSearchParent){
+    public Integer getOrCreateParentIdByPath(String path){
         if(path == null){
             return null;
         }
+        Integer id;
 
         cursor = database.rawQuery("select id, path, isDirectory, length, parentId from fileData where path = '" + path + "'", null);
         if(cursor.getCount() > 0){
-            return cursorToFileEntity(cursor).getId();
+             id = cursorToFileEntity(cursor).getId();
         }else{
             File file = new File(path);
-            if(recursiveSearchParent == true){
-                return insert(path, null, 1, getOrCreateParentIdByPath(file.getParent(), true));
-            }else{
-                return insert(path, null, 1, null);
-            }
+            id = insert(path, null, 1, getOrCreateParentIdByPath(file.getParent()));
         }
+        cursor.close();
+        return id;
+    }
+
+    public List<FileEntity> getTopLevelDirectories(String path){
+        List<FileEntity> topLevelDirs = new ArrayList<FileEntity>();
+        cursor = database.rawQuery("select id, path, isDirectory, length, parentId from filedata"
+                +" where parentid = "
+                +"(select id from filedata where path = '" + path + "') and iSDirectory =1", null);
+        if(cursor.getCount() > 0){
+            topLevelDirs = cursorToFileEntityList(cursor);
+        }
+
+        cursor.close();
+        return topLevelDirs;
     }
 
     public Integer getDirectorySize(String path){
@@ -94,6 +105,7 @@ public class FileDbDAO {
             }
             //Toast.makeText(mContext, “Toast”, Toast.LENGTH_SHORT).show();
         }
+        cursor.close();
         return dirSize;
     }
 

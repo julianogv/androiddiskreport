@@ -14,12 +14,16 @@ import android.widget.LinearLayout;
 
 import com.julianogv.androiddiskreport.database.FileDbDAO;
 import com.julianogv.androiddiskreport.database.FileDbHelper;
+import com.julianogv.androiddiskreport.database.FileEntity;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends Activity {
+
+    FileDbDAO dbDAO;
 
 
     @Override
@@ -27,36 +31,49 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        dbDAO = new FileDbDAO(this);
+
+        File src = new File("/storage/emulated/0/Pictures");
+        //saveFileListIntoDatabase(src);
+        List<FileEntity> topLevelDirs = dbDAO.getTopLevelDirectories (src.getPath());
+
+        //set directory full length
+        for(int i=0; i < topLevelDirs.size(); i++){
+            topLevelDirs.get(i).setFullLength(dbDAO.getDirectorySize(topLevelDirs.get(i).getPath()));
+        }
+
+        //specify where the pie chart will be created
         LinearLayout lv1 = (LinearLayout) findViewById(R.id.linear);
-        PieChartView pieChartView = new PieChartView(this);
+        PieChartView pieChartView = new PieChartView(this, topLevelDirs);
         lv1.addView(pieChartView);
 
-        /*try {
-            Process p =  Runtime.getRuntime().exec("su");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
 
-        List<File> files = Utils.getFileList(new File("/storage/emulated/0"));
 
-        FileDbDAO dbDAO = new FileDbDAO(this);
-        Integer parentId;
+        Integer dirSize = dbDAO.getDirectorySize(src.getPath());
+        Log.d("JULIANOJ", "Directory size: " + dirSize);
+    }
+
+    public void saveFileListIntoDatabase(File src){
+        List<File> files = Utils.getFileList(src);
 
         Log.d("JULIANOJ", "FILES FOUND: " + files.size());
 
-        for(int i=0; i < files.size(); i++){
+        if(files.size() > 0){
+            //insert src path
+            dbDAO.insert(src.getPath(), ((Long)src.length()).intValue(), 1, null);
+            Integer parentId;
 
-            if(i % 1000 == 0){
-                Log.d("JULIANOJ", "CURRENT POS: " + i);
+            for(int i=0; i < files.size(); i++){
+
+                if(i % 1000 == 0){
+                    Log.d("JULIANOJ", "CURRENT POS: " + i);
+                }
+                Long longLength = files.get(i).length();
+                Integer isDirectory = files.get(i).isDirectory() == true ? 1 : 0;
+                parentId = dbDAO.getOrCreateParentIdByPath(files.get(i).getParent());
+                dbDAO.insert(files.get(i).getPath(), longLength.intValue(), isDirectory, parentId);
             }
-            Long longLength = files.get(i).length();
-            Integer isDirectory = files.get(i).isDirectory() == true ? 1 : 0;
-            parentId = dbDAO.getOrCreateParentIdByPath(files.get(i).getParent(), false);
-            dbDAO.insert(files.get(i).getPath(), longLength.intValue(), isDirectory, parentId);
         }
-
-        Integer dirSize = dbDAO.getDirectorySize("/");
-        Log.d("JULIANOJ", "Directory size: " + dirSize);
     }
 
     @Override

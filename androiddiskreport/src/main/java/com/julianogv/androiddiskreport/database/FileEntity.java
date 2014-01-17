@@ -10,6 +10,8 @@ public class FileEntity {
     private Integer isDirectory;
     private Integer parentId;
 
+    private Integer fullLength;
+
     public FileEntity(){
 
     }
@@ -61,5 +63,13 @@ public class FileEntity {
 
     public void setParentId(Integer parentId) {
         this.parentId = parentId;
+    }
+
+    public Integer getFullLength() {
+        return fullLength;
+    }
+
+    public void setFullLength(Integer fullLength) {
+        this.fullLength = fullLength;
     }
 }

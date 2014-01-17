@@ -19,8 +19,7 @@ public class Utils {
 
         File[] files = directory.listFiles();
         if(files == null){
-            Log.d("JULIANOJ", "NULL FILE");
-            return inFiles;
+             return inFiles;
         }
 
         for (File file : files) {
@@ -32,4 +31,19 @@ public class Utils {
         }
         return inFiles;
     }
+
+    public static float[] calculateData(float[] data) {
+        // TODO Auto-generated method stub
+        float total=0;
+        for(int i=0;i<data.length;i++)
+        {
+            total+=data[i];
+        }
+        for(int i=0;i<data.length;i++)
+        {
+            data[i]=360*(data[i]/total);
+        }
+        return data;
+    }
+
 }

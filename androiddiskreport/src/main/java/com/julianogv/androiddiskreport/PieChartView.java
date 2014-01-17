@@ -11,7 +11,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
+import com.julianogv.androiddiskreport.database.FileEntity;
+
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Created by juliano.vieira on 14/01/14.
@@ -25,9 +29,11 @@ public class PieChartView extends View {
     private ArrayList<Float> values;
     Bitmap bitmap;
     Context mContext;
+    List<ColorDictionary> colorDictionaries;
 
-    public PieChartView(Context context) {
+    public PieChartView(Context context, List<FileEntity> directories) {
         super(context);
+        colorDictionaries = new ArrayList<ColorDictionary>();
 
         mContext = context;
 
@@ -37,21 +43,37 @@ public class PieChartView extends View {
         colors = new ArrayList<Integer>();
         values = new ArrayList<Float>();
 
-        startX = 320 / 4;
-        startY = 480 / 8;
-        radius = 680 / 2;
+        startX = 0;
+        startY = 0;
+        radius = 1000;
 
         colors.add(Color.GREEN);
         colors.add(Color.CYAN);
         colors.add(Color.MAGENTA);
         colors.add(Color.BLUE);
         colors.add(Color.RED);
+        colors.add(Color.YELLOW);
 
         values.add(5f);
         values.add(1f);
         values.add(3f);
         values.add(5f);
         values.add(2f);
+        values.add(2f);
+
+    }
+
+    private float[] calculateData(float[] data) {
+        float total=0;
+        for(int i=0;i<data.length;i++)
+        {
+            total+=data[i];
+        }
+        for(int i=0;i<data.length;i++)
+        {
+            data[i]=360*(data[i]/total);
+        }
+        return data;
 
     }
 
@@ -63,7 +85,7 @@ public class PieChartView extends View {
 
         Canvas c = new Canvas(bitmap);
 
-        Log.e("", "onDraw() is called...");
+        Log.e("JULIANOJ", "onDraw() is called...");
 
         float offset = 0;
         float sum = 0;
